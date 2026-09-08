@@ -1,20 +1,30 @@
 @echo off
-chcp 65001 >nul
-echo Compiling AutoClicker with clang-cl...
+setlocal
 
-:: Check if clang-cl is available
-where clang-cl >nul 2>&1
-if %ERRORLEVEL% neq 0 (
-    echo Error: clang-cl not found. Please install LLVM or use Developer Command Prompt for VS with Clang support.
+REM Проверка наличия clang-cl
+where clang-cl >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo Error: clang-cl not found. Please ensure LLVM is installed and in PATH.
+    echo Or run this from 'Developer Command Prompt for VS'.
     exit /b 1
 )
 
-:: Compile with optimizations for small size
-clang-cl /EHsc /O1 /GL main.cpp /Fe:AutoClicker.exe /link /LTCG user32.lib comctl3.lib shell32.lib
+echo Compiling AutoClicker with clang-cl...
 
-if %ERRORLEVEL% equ 0 (
+REM Флаги компиляции:
+REM /O2 - Максимальная оптимизация скорости
+REM /W4 - Высокий уровень предупреждений
+REM /EHsc - Обработка исключений C++
+REM /FeAutoClicker.exe - Имя выходного файла
+REM /link user32.lib comctl32.lib - Подключаемые библиотеки
+
+clang-cl /nologo /O2 /W4 /EHsc /FeAutoClicker.exe main.cpp /link user32.lib comctl32.lib
+
+if %ERRORLEVEL% EQU 0 (
     echo Compilation successful! Output: AutoClicker.exe
 ) else (
     echo Compilation failed.
     exit /b 1
 )
+
+endlocal
